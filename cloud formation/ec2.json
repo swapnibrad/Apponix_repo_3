@@ -1,0 +1,32 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "For testing prespective for batch 3",
+    "Resources": {
+        "instance1": {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "ImageId" : "ami-0f88e80871fd81e91",
+                "InstanceType" : "t2.micro",
+                "KeyName" : "delete_nv_b",
+                "SubnetId" : "subnet-023f3e2bd7473552e",
+                "Tags" : [
+                    {
+                        "Key": "Project",
+                        "Value": "p-Academy"
+                    },
+                    {
+                        "Key": "Cloud",
+                        "Value": "AWS-cloud"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "AWS-cloud-test"
+                    }
+                    
+                ],
+                "IamInstanceProfile" :"batch3"
+              }
+          }
+          
+    }
+}

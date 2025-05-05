@@ -1,0 +1,56 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "For testing prespective for batch 3",
+    "Resources": {
+        "iamuser1": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Project",
+                        "Value": "p-Academy"
+                    }
+                ],
+                "UserName": "Tejaswini-user1"
+            }
+        },
+        "iamuser2": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Project",
+                        "Value": "p-Academy"
+                    },
+                    {
+                        "Key": "Cloud",
+                        "Value": "AWS-cloud"
+                    }
+                ],
+                "UserName": "Sakshi-user2"
+            }
+        },
+        "Group": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": "String-group"
+            }
+        },
+        "UserinGrp": {
+            "Type": "AWS::IAM::UserToGroupAddition",
+            "Properties": {
+                "GroupName": {
+                    "Ref": "Group"
+                },
+                "Users": [
+                    {
+                        "Ref": "iamuser1"
+                    },
+                    {
+                        "Ref": "iamuser2"
+                    }
+                ]
+            }
+        }
+    }
+}
