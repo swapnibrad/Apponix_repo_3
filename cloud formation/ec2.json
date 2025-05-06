@@ -3,13 +3,13 @@
     "Description": "For testing prespective for batch 3",
     "Resources": {
         "instance1": {
-            "Type" : "AWS::EC2::Instance",
-            "Properties" : {
-                "ImageId" : "ami-0f88e80871fd81e91",
-                "InstanceType" : "t2.micro",
-                "KeyName" : "delete_nv_b",
-                "SubnetId" : "subnet-023f3e2bd7473552e",
-                "Tags" : [
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-0f88e80871fd81e91",
+                "InstanceType": "t2.micro",
+                "KeyName": "delete_nv_b",
+                "SubnetId": "subnet-0c738f7de9d82d5d9",
+                "Tags": [
                     {
                         "Key": "Project",
                         "Value": "p-Academy"
@@ -20,13 +20,81 @@
                     },
                     {
                         "Key": "Name",
-                        "Value": "AWS-cloud-test"
+                        "Value": "Public-test-instance"
                     }
-                    
                 ],
-                "IamInstanceProfile" :"batch3"
-              }
-          }
-          
+                "IamInstanceProfile": "batch3",
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "securityGrp"
+                    }
+                ]
+            }
+        },
+        "securityGrp": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security group for testing purpose",
+                "GroupName": "my-securityGrp",
+                "SecurityGroupEgress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "IpProtocol": "-1",
+                        "Description": "Allow all outbound traffic"
+                    }
+                ],
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 22,
+                        "ToPort": 22,
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 80,
+                        "ToPort": 100,
+                        "CidrIp": "152.56.16.154/32",
+                        "Description": "Allow for my CIDR traffic"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Security-group-1"
+                    }
+                ],
+                "VpcId": "vpc-07ddc702bb6902762"
+            }
+        },
+        "instance2": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-0f88e80871fd81e91",
+                "InstanceType": "t2.micro",
+                "KeyName": "delete_nv_b",
+                "SubnetId": "subnet-023880df7500765a3",
+                "Tags": [
+                    {
+                        "Key": "Project",
+                        "Value": "p-Academy"
+                    },
+                    {
+                        "Key": "Cloud",
+                        "Value": "AWS-cloud"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Private-test-instance"
+                    }
+                ],
+                "IamInstanceProfile": "batch3",
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "securityGrp"
+                    }
+                ]
+            }
+        }
     }
 }
