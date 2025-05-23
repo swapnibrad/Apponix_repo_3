@@ -1,0 +1,36 @@
+pipeline {
+    agent { label 'node1' }
+
+    stages {
+        stage('install web') {
+            steps {
+               
+                echo 'pull data from github to working directory..!!'
+                sh '''
+                    sudo yum update -y
+                    sudo dnf install httpd -y
+                '''
+            }
+        }
+        stage('update webapp status') {
+            steps {
+               
+                sh '''
+                 sudo systemctl start httpd.service
+                    sudo systemctl status httpd.service 
+                 echo "updated status of web page"
+                '''
+            }
+    }
+        stage('s3 copy') {
+            steps {
+               
+                sh '''
+                 aws s3 cp s3://academy.nv.batch3/2095_level/2095_level/  /mnt --recursive
+                 sudo cp -fr /mnt/* /var/www/html/ 
+                 echo "updated web page"
+                '''
+            }
+    }
+}
+}
