@@ -86,6 +86,7 @@ pipeline {
                         unzip ./*.zip
                         sudo sh ./apache-tomcat-9.0.105/bin/catalina.sh start
                         echo "Tomcat application is in working state..."
+                        
                     '''
                 }
             }
@@ -97,6 +98,7 @@ pipeline {
                     sh '''
                         echo "Deployment complete. Web server should be live at:"
                         hostname -I | awk '{print "http://" $1}'
+                        echo "success fully deployed pipeline"
                     '''
                 }
             }
