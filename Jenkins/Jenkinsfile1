@@ -1,78 +1,37 @@
-//  jenkins pipeline to create webserver using data from s3 bucket
-
 pipeline {
-    agent { label 'node1' }
-
-    environment {
-        S3_BUCKET = 'academy.nv.batch3'
-        S3_PATH = '2095_level/2095_level/'
-        WEB_DIR = '/var/www/html'
-    }
+    agent { label 'maven_node' }
     stages {
-        stage('Install Apache') {
+        stage('git-commit') { 
             steps {
-                script {
-                    sh '''
-                        echo "Updating packages and installing Apache..."
-                        sudo apt-get update -y
-                        sudo apt-get install apache2 -y
-                        sudo systemctl enable apache2
-                        sudo systemctl start apache2
-                    '''
-                }
+               echo "cloneing student file in node_1"
+               git 'https://github.com/swapnibrad/studentapp-ui.git'
             }
         }
-
-        stage('Clear Old Content') {
+        stage('build') { 
             steps {
-                script {
-                    sh '''
-                        echo "Clearing existing content in $WEB_DIR..."
-                        sudo rm -rf $WEB_DIR/*
-                    '''
-                }
+                echo "build by maven in node_1" 
+                sh '''
+                sudo apt-get update
+                sudo apt-get install maven -y
+                sudo mvn -v
+                sudo mvn clean
+                sudo mvn package
+                '''
             }
         }
-
-        stage('Download Web Content from S3') {
+        stage('Deploy') { 
             steps {
-                script {
-                    sh '''
-                        echo "Installing AWS CLI if not present..."
-                        if ! command -v aws &> /dev/null; then
-                           sudo apt-get update
-                           sudo apt-get install python3-pip -y
-                           sudo pip install awscli --break-system-packages
-                            aws --version
-                        fi
+                sh '''
+                sudo apt-get update
+                sudo aws s3 cp /home/ubuntu/workspace/pipeline_2/target/studentapp-2.2-SNAPSHOT.war s3://stockholm.artifact.bucket.demo
+                echo "application deployed in node_1"
+                sudo curl -O https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.96/bin/apache-tomcat-8.5.96.zip
+                sudo unzip apache-tomcat-8.5.96.zip
+                sudo sh /home/ubuntu/workspace/pipeline_2/apache-tomcat-8.5.96/bin/catalina.sh start
+                sudo aws s3 cp s3://stockholm.artifact.bucket.demo/studentapp-2.2-SNAPSHOT.war /home/ubuntu/workspace/pipeline_2/apache-tomcat-8.5.96/webapps/studentapp.war
+                
+                '''
 
-                        echo "Copying web content from S3..."
-                        sudo aws s3 cp s3://$S3_BUCKET/$S3_PATH $WEB_DIR/ --recursive
-                    '''
-                }
-            }
-        }
-
-        stage('Set Permissions') {
-            steps {
-                script {
-                    sh '''
-                        echo "Setting permissions..."
-                        sudo chown -R root:root $WEB_DIR
-                        sudo chmod -R 755 $WEB_DIR
-                    '''
-                }
-            }
-        }
-
-        stage('Verify Deployment') {
-            steps {
-                script {
-                    sh '''
-                        echo "Deployment complete. Web server should be live at:"
-                        hostname -I | awk '{print "http://" $1}'
-                    '''
-                }
             }
         }
     }

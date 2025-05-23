@@ -1,7 +1,7 @@
 //  jenkins pipeline to create webserver using data from s3 bucket
 
 pipeline {
-    agent { label 'node1' }
+    agent { label 'Label-1' }
 
     environment {
         S3_BUCKET = 'academy.nv.batch3'
@@ -34,7 +34,7 @@ pipeline {
             }
         }
 
-        stage('Download Web Content from S3') {
+        stage('Install AWS CLi') {
             steps {
                 script {
                     sh '''
@@ -45,6 +45,16 @@ pipeline {
                            sudo pip install awscli --break-system-packages
                             aws --version
                         fi
+
+                    '''
+                }
+            }
+        }
+
+        stage('Download Web Content from S3') {
+            steps {
+                script {
+                    sh '''
 
                         echo "Copying web content from S3..."
                         sudo aws s3 cp s3://$S3_BUCKET/$S3_PATH $WEB_DIR/ --recursive
@@ -60,6 +70,22 @@ pipeline {
                         echo "Setting permissions..."
                         sudo chown -R root:root $WEB_DIR
                         sudo chmod -R 755 $WEB_DIR
+                    '''
+                }
+            }
+        }
+
+        stage('install tomcat') {
+            steps {
+                script {
+                    sh '''
+                        echo "installing tomcat application..."
+                        sudo apt-get update
+                        sudo apt-get install wget unzip -y 
+                        wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.105/bin/apache-tomcat-9.0.105.zip
+                        unzip ./*.zip
+                        sudo sh ./apache-tomcat-9.0.105/bin/catalina.sh start
+                        echo "Tomcat application is in working state..."
                     '''
                 }
             }
